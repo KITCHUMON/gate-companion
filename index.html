@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>GATE 2027 — ECE Study Companion</title>
+  <meta name="description" content="Your personal GATE 2027 ECE study companion. Track subjects, mock scores, errors, and study sessions all in one place."/>
+  <meta name="theme-color" content="#6c63ff"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="GATE 2027"/>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="apple-touch-icon" href="icon-192.png"/>
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">G</div>
+      <div class="logo-text">
+        <span class="logo-title">GATE 2027</span>
+        <span class="logo-sub">ECE Companion</span>
+      </div>
+    </div>
+    <div style="padding: 10px 20px; border-bottom: 1px solid var(--border);">
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--primary-light);background:rgba(108,99,255,0.1);padding:8px 12px;border-radius:8px;border:1px solid rgba(108,99,255,0.2);cursor:pointer;transition:all 0.2s;" onmouseover="this.style.background='rgba(108,99,255,0.15)'" onmouseout="this.style.background='rgba(108,99,255,0.1)'">
+        <input type="checkbox" id="test-mode-toggle" onchange="toggleTestMode(this.checked)" style="cursor:pointer; accent-color:var(--primary); width: 16px; height: 16px;" />
+        Test Mode (Sandbox)
+      </label>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard')">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" data-tab="subjects" onclick="switchTab('subjects')">
+        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Subjects
+      </a>
+      <a class="nav-item" onclick="toggleSyllabusDrawer()">
+        <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+        Syllabus Tracker
+      </a>
+      <a class="nav-item" data-tab="planner" onclick="switchTab('planner')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Planner
+      </a>
+      <a class="nav-item" data-tab="timer" onclick="switchTab('timer')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Timer
+      </a>
+      <a class="nav-item" data-tab="mocks" onclick="switchTab('mocks')">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Mock Scores
+      </a>
+      <a class="nav-item" data-tab="errors" onclick="switchTab('errors')">
+        <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Error Notebook
+      </a>
+      <a class="nav-item" data-tab="formulas" onclick="switchTab('formulas')">
+        <svg viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+        Formula Bank
+      </a>
+      <a class="nav-item" data-tab="schedule" onclick="switchTab('schedule')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        Schedule
+      </a>
+      <a class="nav-item" data-tab="reports" onclick="switchTab('reports')">
+        <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        Reports
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="target-badge">
+        <span class="target-label">Target</span>
+        <span class="target-value">AIR 50</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <!-- ===== DASHBOARD ===== -->
+    <div class="tab-content active" id="tab-dashboard">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-sub" id="greeting-text">Good morning! Let's crush it today.</p>
+        </div>
+        <div class="header-date" id="header-date"></div>
+      </div>
+
+      <!-- Countdown Banner -->
+      <div class="countdown-banner">
+        <div class="countdown-inner">
+          <div class="countdown-label">⚡ GATE 2027 Countdown</div>
+          <div class="countdown-blocks">
+            <div class="cd-block"><span id="cd-days">--</span><small>days</small></div>
+            <div class="cd-sep">:</div>
+            <div class="cd-block"><span id="cd-hours">--</span><small>hrs</small></div>
+            <div class="cd-sep">:</div>
+            <div class="cd-block"><span id="cd-mins">--</span><small>min</small></div>
+            <div class="cd-sep">:</div>
+            <div class="cd-block"><span id="cd-secs">--</span><small>sec</small></div>
+          </div>
+          <div class="countdown-phase" id="current-phase">Phase 1: Foundation Building</div>
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon orange">🔥</div>
+          <div class="stat-info">
+            <div class="stat-value" id="streak-val">0</div>
+            <div class="stat-label">Day Streak</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue">⏱️</div>
+          <div class="stat-info">
+            <div class="stat-value" id="today-hours">0h 0m</div>
+            <div class="stat-label">Today's Study Time</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon purple">📚</div>
+          <div class="stat-info">
+            <div class="stat-value" id="total-topics-done">0%</div>
+            <div class="stat-label">Syllabus Covered</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">📝</div>
+          <div class="stat-info">
+            <div class="stat-value" id="best-mock">--</div>
+            <div class="stat-label">Best Mock Score</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="charts-row">
+        <div class="chart-card wide">
+          <div class="chart-header">
+            <h3>Weekly Study Hours</h3>
+            <span class="chart-sub">This week</span>
+          </div>
+          <canvas id="weeklyChart" height="160"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Subject Coverage</h3>
+          </div>
+          <canvas id="subjectPieChart" height="180"></canvas>
+        </div>
+      </div>
+
+      <!-- AI Insights -->
+      <div class="ai-insights-card">
+        <div class="ai-header">
+          <div class="ai-icon">✨</div>
+          <h3>Personalised Insights</h3>
+        </div>
+        <div class="ai-insights-content" id="ai-insights-content">
+          <div class="insight-item">Analyzing your study patterns...</div>
+        </div>
+      </div>
+
+      <!-- Quote of the Day -->
+      <div class="quote-of-day" id="quote-of-day">
+        <div class="qod-icon">💡</div>
+        <div class="qod-content">
+          <div class="qod-label">Quote of the Day</div>
+          <div class="qod-text" id="qod-text">Loading...</div>
+          <div class="qod-author" id="qod-author"></div>
+        </div>
+        <button class="qod-refresh" onclick="refreshQuote()" title="New Quote">↻</button>
+      </div>
+
+      <!-- Today's Tasks + Quick Log -->
+      <div class="bottom-row">
+        <div class="tasks-card">
+          <div class="card-header-row">
+            <h3>Today's Tasks</h3>
+            <button class="btn-small" onclick="switchTab('planner')">View All →</button>
+          </div>
+          <div id="today-tasks-list" class="tasks-list"></div>
+        </div>
+        <div class="quick-log-card">
+          <h3>Quick Study Log</h3>
+          <p class="quick-log-sub">Log hours you studied today</p>
+          <div class="quick-log-form">
+            <select id="ql-subject" class="form-select">
+              <option value="">Select Subject</option>
+            </select>
+            <div class="time-inputs">
+              <input type="number" id="ql-hours" placeholder="Hrs" min="0" max="12" class="form-input small"/>
+              <input type="number" id="ql-mins" placeholder="Min" min="0" max="59" class="form-input small"/>
+            </div>
+            <button class="btn-primary" onclick="logStudyTime()">Log Time ✓</button>
+          </div>
+          <div class="study-log-list" id="study-log-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SUBJECTS ===== -->
+    <div class="tab-content" id="tab-subjects">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Subjects</h1>
+          <p class="page-sub">Track your topic-wise progress across all ECE subjects</p>
+        </div>
+      </div>
+      <div class="subjects-grid" id="subjects-grid"></div>
+    </div>
+
+    <!-- ===== PLANNER ===== -->
+    <div class="tab-content" id="tab-planner">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Study Planner</h1>
+          <p class="page-sub">Organize your daily study tasks</p>
+        </div>
+        <button class="btn-primary" onclick="openAddTask()">+ Add Task</button>
+      </div>
+      <div class="planner-filters">
+        <button class="filter-btn active" onclick="filterTasks('all', this)">All</button>
+        <button class="filter-btn" onclick="filterTasks('today', this)">Today</button>
+        <button class="filter-btn" onclick="filterTasks('pending', this)">Pending</button>
+        <button class="filter-btn" onclick="filterTasks('done', this)">Completed</button>
+      </div>
+      <div class="tasks-container" id="tasks-container"></div>
+
+      <!-- Add Task Modal -->
+      <div class="modal-overlay" id="task-modal" onclick="closeModal('task-modal')">
+        <div class="modal" onclick="event.stopPropagation()">
+          <h3 class="modal-title">Add Study Task</h3>
+          <div class="form-group">
+            <label>Task Title</label>
+            <input type="text" id="task-title" placeholder="e.g., Complete Chapter 3 - Op-Amps" class="form-input"/>
+          </div>
+          <div class="form-group">
+            <label>Subject</label>
+            <select id="task-subject" class="form-select">
+              <option value="">Select Subject</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Due Date</label>
+            <input type="date" id="task-date" class="form-input"/>
+          </div>
+          <div class="form-group">
+            <label>Priority</label>
+            <select id="task-priority" class="form-select">
+              <option value="high">🔴 High</option>
+              <option value="medium" selected>🟡 Medium</option>
+              <option value="low">🟢 Low</option>
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button class="btn-secondary" onclick="closeModal('task-modal')">Cancel</button>
+            <button class="btn-primary" onclick="addTask()">Add Task</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TIMER ===== -->
+    <div class="tab-content" id="tab-timer">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Focus Timer</h1>
+          <p class="page-sub">Pomodoro technique for deep study sessions</p>
+        </div>
+      </div>
+      <div class="timer-layout">
+        <div class="timer-main-card">
+          <div class="timer-mode-tabs">
+            <button class="mode-btn active" id="mode-pomodoro" onclick="setTimerMode('pomodoro')">Pomodoro (25m)</button>
+            <button class="mode-btn" id="mode-short" onclick="setTimerMode('short')">Short Break (5m)</button>
+            <button class="mode-btn" id="mode-long" onclick="setTimerMode('long')">Long Break (15m)</button>
+            <button class="mode-btn" id="mode-custom" onclick="setTimerMode('custom')">Custom</button>
+            <button class="mode-btn" id="mode-stopwatch" onclick="setTimerMode('stopwatch')">Stopwatch</button>
+          </div>
+          <div class="timer-display">
+            <svg class="timer-ring" viewBox="0 0 200 200">
+              <circle class="ring-bg" cx="100" cy="100" r="88"/>
+              <circle class="ring-progress" id="ring-progress" cx="100" cy="100" r="88"/>
+            </svg>
+            <div class="timer-text">
+              <span id="timer-display">25:00</span>
+              <span id="timer-label">Focus</span>
+            </div>
+          </div>
+          <div id="custom-time-inputs" class="custom-inputs hidden">
+            <input type="number" id="custom-mins" placeholder="Minutes" min="1" max="180" class="form-input"/>
+          </div>
+          <div class="timer-subject-select">
+            <select id="timer-subject" class="form-select">
+              <option value="">Studying: Select Subject</option>
+            </select>
+          </div>
+          <div class="timer-controls">
+            <button class="btn-timer-reset" onclick="resetTimer()" title="Reset">↺</button>
+            <button class="btn-timer-main" id="timer-toggle" onclick="toggleTimer()">▶ Start</button>
+            <button class="btn-timer-skip" onclick="skipTimer()" title="Skip">⏭</button>
+          </div>
+          <div class="session-count">
+            Sessions today: <strong id="session-count">0</strong>
+            <span class="tomatoes" id="tomato-icons">🍅</span>
+          </div>
+        </div>
+        <div class="timer-side">
+          <div class="timer-tips-card">
+            <h3>Pomodoro Method</h3>
+            <ol class="tips-list">
+              <li>Work for 25 minutes with full focus</li>
+              <li>Take a 5-minute break</li>
+              <li>Every 4 sessions → take a 15-minute break</li>
+              <li>Stay away from phone during session</li>
+            </ol>
+          </div>
+          <div class="timer-stats-card">
+            <h3>Today's Sessions</h3>
+            <div class="session-log" id="session-log">
+              <p class="empty-state-small">No sessions yet today</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MOCK SCORES ===== -->
+    <div class="tab-content" id="tab-mocks">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Mock Test Tracker</h1>
+          <p class="page-sub">Track your score progression and identify weak areas</p>
+        </div>
+        <button class="btn-primary" onclick="openAddMock()">+ Add Score</button>
+      </div>
+      <div class="mock-stats-row">
+        <div class="mock-stat-card">
+          <div class="mock-stat-label">Best Score</div>
+          <div class="mock-stat-val green" id="mock-best">—</div>
+        </div>
+        <div class="mock-stat-card">
+          <div class="mock-stat-label">Latest Score</div>
+          <div class="mock-stat-val blue" id="mock-latest">—</div>
+        </div>
+        <div class="mock-stat-card">
+          <div class="mock-stat-label">Average</div>
+          <div class="mock-stat-val purple" id="mock-avg">—</div>
+        </div>
+        <div class="mock-stat-card">
+          <div class="mock-stat-label">Tests Taken</div>
+          <div class="mock-stat-val orange" id="mock-count">0</div>
+        </div>
+      </div>
+      <div class="mock-chart-card">
+        <h3>Score Trend</h3>
+        <canvas id="mockChart" height="120"></canvas>
+      </div>
+      <div class="mock-list" id="mock-list">
+        <div class="empty-state">
+          <div class="empty-icon">📊</div>
+          <p>No mock tests logged yet.<br/>Add your first score to start tracking!</p>
+        </div>
+      </div>
+
+      <!-- Add Mock Modal -->
+      <div class="modal-overlay" id="mock-modal" onclick="closeModal('mock-modal')">
+        <div class="modal" onclick="event.stopPropagation()">
+          <h3 class="modal-title">Log Mock Test</h3>
+          <div class="form-group">
+            <label>Test Name / Platform</label>
+            <input type="text" id="mock-name" placeholder="e.g., MADE EASY Full Mock #3" class="form-input"/>
+          </div>
+          <div class="form-group">
+            <label>Score (out of 100)</label>
+            <input type="number" id="mock-score" placeholder="e.g., 62.5" min="0" max="100" step="0.5" class="form-input"/>
+          </div>
+          <div class="form-group">
+            <label>Date Taken</label>
+            <input type="date" id="mock-date" class="form-input"/>
+          </div>
+          <div class="form-group">
+            <label>Weak Areas / Notes</label>
+            <textarea id="mock-notes" placeholder="Topics you struggled with..." class="form-textarea" rows="3"></textarea>
+          </div>
+          <div class="modal-actions">
+            <button class="btn-secondary" onclick="closeModal('mock-modal')">Cancel</button>
+            <button class="btn-primary" onclick="addMockScore()">Save Score</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ERROR NOTEBOOK ===== -->
+    <div class="tab-content" id="tab-errors">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Error Notebook</h1>
+          <p class="page-sub">Log your mistakes — review them to never repeat</p>
+        </div>
+        <button class="btn-primary" onclick="openAddError()">+ Log Error</button>
+      </div>
+      <div class="error-filters">
+        <input type="text" id="error-search" placeholder="🔍 Search errors..." class="search-input" oninput="renderErrors()"/>
+        <select id="error-filter-subject" class="form-select small" onchange="renderErrors()">
+          <option value="">All Subjects</option>
+        </select>
+        <select id="error-filter-type" class="form-select small" onchange="renderErrors()">
+          <option value="">All Types</option>
+          <option value="concept">Concept Gap</option>
+          <option value="formula">Wrong Formula</option>
+          <option value="calculation">Calculation</option>
+          <option value="misread">Misread Question</option>
+          <option value="silly">Silly Mistake</option>
+        </select>
+      </div>
+      <div class="errors-list" id="errors-list">
+        <div class="empty-state">
+          <div class="empty-icon">📓</div>
+          <p>Your error notebook is empty.<br/>Log mistakes to review and improve!</p>
+        </div>
+      </div>
+
+      <!-- Add Error Modal -->
+      <div class="modal-overlay" id="error-modal" onclick="closeModal('error-modal')">
+        <div class="modal large" onclick="event.stopPropagation()">
+          <h3 class="modal-title">Log an Error</h3>
+          <div class="form-group">
+            <label>Topic / Question</label>
+            <input type="text" id="error-topic" placeholder="e.g., Op-Amp Integrator Circuit" class="form-input"/>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Subject</label>
+              <select id="error-subject" class="form-select">
+                <option value="">Select</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Error Type</label>
+              <select id="error-type" class="form-select">
+                <option value="concept">Concept Gap</option>
+                <option value="formula">Wrong Formula</option>
+                <option value="calculation">Calculation Error</option>
+                <option value="misread">Misread Question</option>
+                <option value="silly">Silly Mistake</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>What went wrong?</label>
+            <textarea id="error-desc" placeholder="Describe what you got wrong and why..." class="form-textarea" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Correct approach / Lesson learned</label>
+            <textarea id="error-lesson" placeholder="Write the correct method or concept to remember..." class="form-textarea" rows="3"></textarea>
+          </div>
+          <div class="modal-actions">
+            <button class="btn-secondary" onclick="closeModal('error-modal')">Cancel</button>
+            <button class="btn-primary" onclick="addError()">Save to Notebook</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== FORMULA BANK ===== -->
+    <div class="tab-content" id="tab-formulas">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Formula Bank</h1>
+          <p class="page-sub">Quick-access ECE formulas — bookmark what you need</p>
+        </div>
+      </div>
+      <div class="formula-filters">
+        <input type="text" id="formula-search" placeholder="🔍 Search formulas..." class="search-input" oninput="renderFormulas()"/>
+        <div class="formula-tabs" id="formula-tabs"></div>
+      </div>
+      <div class="formulas-grid" id="formulas-grid"></div>
+    </div>
+
+    <!-- ===== SCHEDULE ===== -->
+    <div class="tab-content" id="tab-schedule">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Daily Schedule</h1>
+          <p class="page-sub">Your time breakdown — classes + self-study planner</p>
+        </div>
+        <button class="btn-primary" onclick="openQuoteModal()">💫 Motivate Me</button>
+      </div>
+
+      <!-- Time Allocation Banner -->
+      <div class="schedule-banner">
+        <div class="schedule-block class-block">
+          <div class="sb-time">6:30 AM – 2:00 PM</div>
+          <div class="sb-label">🏫 Coaching Classes</div>
+          <div class="sb-duration">7.5 hours</div>
+        </div>
+        <div class="schedule-block free-block">
+          <div class="sb-time">2:00 PM – 11:00 PM</div>
+          <div class="sb-label">📚 Self-Study Time</div>
+          <div class="sb-duration">9 hours available</div>
+        </div>
+        <div class="schedule-block sleep-block">
+          <div class="sb-time">11:00 PM – 6:30 AM</div>
+          <div class="sb-label">😴 Sleep & Recovery</div>
+          <div class="sb-duration">7.5 hours</div>
+        </div>
+      </div>
+
+      <!-- Hour-by-hour timeline -->
+      <div class="schedule-layout">
+        <div class="timeline-card">
+          <h3 class="section-title">Today's Hour-by-Hour Plan</h3>
+          <div class="timeline" id="schedule-timeline"></div>
+        </div>
+        <div class="schedule-side">
+          <div class="study-targets-card">
+            <h3 class="section-title">Daily Study Targets</h3>
+            <div class="target-row">
+              <span class="target-label-sm">Minimum (weekday)</span>
+              <span class="target-val">4 hrs self-study</span>
+            </div>
+            <div class="target-row">
+              <span class="target-label-sm">Good (weekday)</span>
+              <span class="target-val">6 hrs self-study</span>
+            </div>
+            <div class="target-row">
+              <span class="target-label-sm">Excellent (weekend)</span>
+              <span class="target-val">9+ hrs study</span>
+            </div>
+            <div class="target-row">
+              <span class="target-label-sm">Pre-exam sprint</span>
+              <span class="target-val">10–12 hrs / day</span>
+            </div>
+            <div class="phase-rec" id="phase-recommendation"></div>
+          </div>
+          <div class="motivation-card" id="motivation-card">
+            <div class="mc-header">⚡ Power Quote</div>
+            <div class="mc-quote" id="mc-quote-text">Loading...</div>
+            <div class="mc-author" id="mc-quote-author"></div>
+            <button class="btn-small" onclick="refreshSideQuote()">Next Quote →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== REPORTS ===== -->
+    <div class="tab-content" id="tab-reports">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Reports & Analytics</h1>
+          <p class="page-sub">Deep analysis of your study time, habits, and progress</p>
+        </div>
+        <select id="report-period" class="form-select" style="width:auto" onchange="renderReports()">
+          <option value="week">This Week</option>
+          <option value="month">This Month</option>
+          <option value="all">All Time</option>
+        </select>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="report-summary-grid" id="report-summary-grid"></div>
+
+      <!-- Charts Row -->
+      <div class="report-charts-row">
+        <div class="chart-card">
+          <div class="chart-header"><h3>Subject-wise Hours Studied</h3></div>
+          <canvas id="subjectHoursChart" height="220"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><h3>Daily Study Hours (Last 14 Days)</h3></div>
+          <canvas id="dailyTrendChart" height="220"></canvas>
+        </div>
+      </div>
+
+      <!-- Study Heatmap -->
+      <div class="heatmap-card">
+        <div class="chart-header">
+          <h3>Study Activity Heatmap</h3>
+          <span class="chart-sub">Last 90 days</span>
+        </div>
+        <div class="heatmap-legend">
+          <span style="color:#5c6487">Less</span>
+          <div class="heatmap-legend-cells"></div>
+          <span style="color:#5c6487">More</span>
+        </div>
+        <div class="heatmap-grid" id="heatmap-grid"></div>
+        <div class="heatmap-months" id="heatmap-months"></div>
+      </div>
+
+      <!-- Subject Time Breakdown Table -->
+      <div class="breakdown-card">
+        <div class="chart-header"><h3>Subject Time Breakdown</h3></div>
+        <div class="breakdown-table" id="breakdown-table"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ===== MOTIVATION TOAST ===== -->
+  <div class="motivation-toast" id="motivation-toast" onclick="dismissToast()">
+    <div class="toast-spark">⚡</div>
+    <div class="toast-content">
+      <div class="toast-label">Motivation Boost</div>
+      <div class="toast-quote" id="toast-quote"></div>
+      <div class="toast-author" id="toast-author"></div>
+    </div>
+    <button class="toast-close" onclick="dismissToast()">✕</button>
+  </div>
+
+  <!-- ===== QUOTE MODAL (full screen) ===== -->
+  <div class="quote-modal-overlay" id="quote-modal" onclick="closeModal('quote-modal')">
+    <div class="quote-modal" onclick="event.stopPropagation()">
+      <div class="qm-spark">✨</div>
+      <div class="qm-quote" id="qm-quote"></div>
+      <div class="qm-author" id="qm-author"></div>
+      <button class="btn-primary" style="margin-top:24px" onclick="closeModal('quote-modal')">Keep Grinding 💪</button>
+    </div>
+  </div>
+
+  <!-- Syllabus Tracker Drawer -->
+  <div class="syllabus-drawer-overlay" id="syllabus-overlay" onclick="toggleSyllabusDrawer()"></div>
+  <div class="syllabus-drawer" id="syllabus-drawer">
+    <div class="drawer-header">
+      <h2>Syllabus Tracker</h2>
+      <button class="close-drawer" onclick="toggleSyllabusDrawer()">×</button>
+    </div>
+    <div class="drawer-content" id="syllabus-tree-container">
+      <!-- Generated by app.js -->
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>
