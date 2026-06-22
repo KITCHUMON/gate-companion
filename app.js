@@ -619,6 +619,52 @@ function save() {
 }
 
 /* =============================================
+   MIGRATE OLD TOPIC PROGRESS
+   ============================================= */
+function migrateOldTopicProgress() {
+  if (LS.get('topicProgress_migrated', false)) return; // already done
+  
+  const old = state.topicProgress;
+  const oldKeys = Object.keys(old).filter(k => old[k] === true);
+  if (oldKeys.length === 0) { LS.set('topicProgress_migrated', true); return; }
+  
+  // Build mapping: old flat keys -> new nested keys
+  // Old format: subjectId_topicIndex (e.g. math_0, networks_2)
+  // For each old checked topic, mark ALL sub-subtopics of the corresponding new topic as done
+  const oldSubjectIds = ['math','networks','devices','analog','digital','signals','control','comms','em','micro','aptitude'];
+  
+  let migrated = false;
+  oldKeys.forEach(key => {
+    const parts = key.split('_');
+    if (parts.length !== 2) return;
+    const [subId, idxStr] = parts;
+    const idx = parseInt(idxStr);
+    if (isNaN(idx)) return;
+    if (!oldSubjectIds.includes(subId)) return;
+    
+    // Map 'aptitude' to 'apt' (id changed)
+    const newSubId = subId === 'aptitude' ? 'apt' : subId;
+    const subject = SUBJECTS.find(s => s.id === newSubId);
+    if (!subject || !subject.topics[idx]) return;
+    
+    const topic = subject.topics[idx];
+    // Mark all leaf nodes under this topic as done
+    topic.subtopics.forEach(st => {
+      st.subsubtopics.forEach((sst, i) => {
+        const newKey = `${newSubId}_${topic.id}_${st.id}_${i}`;
+        if (!state.topicProgress[newKey]) {
+          state.topicProgress[newKey] = true;
+          migrated = true;
+        }
+      });
+    });
+  });
+  
+  if (migrated) save();
+  LS.set('topicProgress_migrated', true);
+}
+
+/* =============================================
    INIT
    ============================================= */
 function initApp() {
@@ -634,6 +680,9 @@ function initApp() {
     document.body.prepend(banner);
     document.body.style.paddingTop = '32px';
   }
+
+  // Migrate old flat topic keys to new nested keys
+  migrateOldTopicProgress();
 
   setGreeting();
   setHeaderDate();
